@@ -1,0 +1,90 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-4.3.1
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    bind-mount-options: /home/frewind/mariadb:Z
+    io.kubernetes.cri-o.ContainerType/mariadb1: container
+    io.kubernetes.cri-o.ContainerType/phpadmin: container
+    io.kubernetes.cri-o.SandboxID/mariadb1: 3b5148e307ccbe8beef87e4b7328fd900f590075cc7a7fa523499e3d75f5605
+    io.kubernetes.cri-o.SandboxID/phpadmin: 3b5148e307ccbe8beef87e4b7328fd900f590075cc7a7fa523499e3d75f5605
+    io.kubernetes.cri-o.TTY/mariadb1: "false"
+    io.kubernetes.cri-o.TTY/phpadmin: "true"
+    io.podman.annotations.autoremove/mariadb1: "FALSE"
+    io.podman.annotations.autoremove/phpadmin: "TRUE"
+    io.podman.annotations.init/mariadb1: "FALSE"
+    io.podman.annotations.init/phpadmin: "FALSE"
+    io.podman.annotations.privileged/mariadb1: "FALSE"
+    io.podman.annotations.privileged/phpadmin: "FALSE"
+    io.podman.annotations.publish-all/mariadb1: "FALSE"
+    io.podman.annotations.publish-all/phpadmin: "FALSE"
+    org.opencontainers.image.base.digest/phpadmin: sha256:a30849f0235042c57eecad52ab36d0c97b0f57d121ed8710adf16176
+    org.opencontainers.image.base.name/phpadmin: docker.io/library/phpmyadmin:latest
+  creationTimestamp: "2024-01-06T08:50:21Z"
+  labels:
+    app: db0
+  name: db0
+spec:
+  automountServiceAccountToken: false
+  containers:
+  - args:
+    - mysqld
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: superS3cret!
+    - name: MYSQL_DATABASE
+      value: demodb
+    - name: MYSQL_PASSWORD
+      value: password
+    - name: MYSQL_USER
+      value: demo
+    image: docker.io/library/mariadb:10.4.4
+    name: mariadb1
+    ports:
+    - containerPort: 9000
+      hostPort: 9000
+    resources: {}
+    securityContext:
+      capabilities:
+        drop:
+        - CAP_MKNOD
+        - CAP_NET_RAW
+        - CAP_AUDIT_WRITE
+      runAsGroup: 993
+      runAsUser: 1000
+    volumeMounts:
+    - mountPath: /var/lib/mysql
+      name: home-frewind-mariadb-host-0
+  - args:
+    - apache2-foreground
+    env:
+    - name: PMA_HOST
+      value: 127.0.0.1
+    - name: PMA_PORT
+      value: "3306"
+    image: localhost/frewind/phpadmin:latest
+    name: phpadmin
+    resources: {}
+    securityContext:
+      capabilities:
+        drop:
+        - CAP_MKNOD
+        - CAP_NET_RAW
+        - CAP_AUDIT_WRITE
+      runAsGroup: 993
+      runAsUser: 1000
+    tty: true
+  enableServiceLinks: false
+  hostUsers: false
+  hostname: db0
+  restartPolicy: Never
+  volumes:
+  - hostPath:
+      path: /home/frewind/mariadb
+      type: Directory
+    name: home-frewind-mariadb-host-0
+status: {}
+
